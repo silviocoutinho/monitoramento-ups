@@ -1,0 +1,3 @@
+SNMP_HOST = 'localhost'
+SNMP_PORT = 161
+SNMP_COMMUNITY = 'public'
