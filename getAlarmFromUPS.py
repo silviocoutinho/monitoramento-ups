@@ -2,10 +2,14 @@
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 import time, datetime
 import os, sys
+from dotenv import load_dotenv
+load_dotenv()
 
 from getSNMPValue import getSNMPValue
 
-
+SNMP_OID_UPS = os.getenv("SNMP_OID_UPS")
+SECONDS_TO_TIMESTAMP = os.getenv("SECONDS_TO_TIMESTAMP")
+WAIT_TIME_TO_SHUTDOWN = os.getenv("WAIT_TIME_TO_SHUTDOWN")
 
 # Parametro monitorado
 # UPS-MIB::upsInputVoltage.1.0 = INTEGER: 210 RMS Volts
@@ -20,16 +24,16 @@ def monitor(timeStamp):
     time.sleep(5)   
     timeStamp = timeStamp + 5
     
-    if (timeStamp > 360):
+    if (timeStamp > SECONDS_TO_TIMESTAMP):
         timeStamp = 0
         ct = datetime.datetime.now()
         print("current time:-", ct)
 
-    voltagem = getSNMPValue('1.3.6.1.2.1.33.1.3.3.1.3.1.0')
+    voltagem = getSNMPValue(SNMP_OID_UPS)
 
     if (voltagem == "0"):
-        time.sleep(90) # 15min
-        voltagem = getSNMPValue('1.3.6.1.2.1.33.1.3.3.1.3.1.0')
+        time.sleep(WAIT_TIME_TO_SHUTDOWN) # 15min
+        voltagem = getSNMPValue(SNMP_OID_UPS)
         if (voltagem == "0"):
             sendMessage('desligar')
             sys.exit(0)
